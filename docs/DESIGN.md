@@ -23,8 +23,9 @@ Deliberately **out of scope**:
 ## Data source: the CachedDataServer
 
 The plugin talks to the OpenRVDAS **CachedDataServer** (CDS,
-`openrvdas/server/cached_data_server.py`) over its WebSocket API. No CDS
-changes are required; any CDS version with the WebSocket API works.
+`openrvdas/server/cached_data_server.py`) over its WebSocket API, either
+directly or through the OpenRVDAS API's authenticated proxy (see
+[Connection modes](#connection-modes)). No CDS changes are required.
 
 | Request | Used for |
 |---|---|
@@ -66,6 +67,56 @@ Protocol details that shaped the design:
                                                                   ▼
                                     browser: DataSourceWithBackend → panels
 ```
+
+### Connection modes
+
+The CDS itself has no authentication. Anyone who can reach it can read
+every field and can also write to the cache with `publish`. The plugin
+therefore supports two ways in, chosen by `connectionMode` (issue #1):
+
+| | OpenRVDAS API (`proxy`) | Direct (`direct`, legacy) |
+|---|---|---|
+| URL | `ws(s)://<host>/api/v1/ws/data-server` | `ws://<host>:8766`, or nginx `/cds-ws` |
+| Auth | API key in the `X-API-Key` handshake header | none |
+| Writes | proxy answers `publish` with 403 | allowed (the plugin never publishes) |
+| Future | the only remote path after OpenRVDAS v3 | scheduled for removal in v3 (openrvdas#748) |
+
+How the proxy behaves:
+
+- **It is a transparent relay.** Implemented in
+  `openrvdas/web_backend/app/api/data_server.py`, it relays the CDS protocol
+  unchanged after the handshake, so everything above the dial step is shared
+  by both modes.
+- **Rejections happen at the handshake.** It rejects a missing, invalid,
+  revoked or expired key, or a key without the `WEBSOCKET` permission on
+  `/api/v1/ws/data-server`, during the handshake with **HTTP 403**. `Dial`
+  turns any non-101 handshake response into a `cds.HandshakeError` carrying
+  the status code. The health check and query errors then explain 403 (key
+  problem) and 404 (wrong path, or no proxy on that server) for the
+  configured mode.
+- **An unreachable CDS is reported in a message.** If the CDS behind the
+  proxy is down, the proxy sends
+  `{"type":"error","status":503,"message":...}` and closes. The client treats
+  `type:"error"` as a failure and reads the text from `message` as well as
+  the CDS's own `error` key.
+
+Rules for the key:
+
+- **Header, not query string.** The key is sent in the `X-API-Key` header,
+  never as `?api_key=`, so it stays out of proxy and server access logs.
+- **Storage.** It is stored in `secureJsonData`, so Grafana encrypts it and
+  only the backend can read it. Browsers never see it.
+- **Proxy mode only.** It is sent only in proxy mode
+  (`PluginSettings.EffectiveAPIKey`). A key left over from switching modes is
+  not sent to a direct CDS.
+
+Defaults:
+
+- **Unset mode means direct.** A missing or empty `connectionMode` is treated
+  as direct, so data sources created before the setting existed keep
+  working.
+- **New data sources start in proxy mode.** The config editor sets `proxy`
+  when a data source has neither a mode nor a URL.
 
 ### Why a Go backend
 
@@ -187,13 +238,13 @@ the update interval. For example, the compass and attitude panels default to
 
 ## Configuration
 
-| jsonData key | Default | Meaning |
+| Key | Default | Meaning |
 |---|---|---|
-| `url` | (required) | CDS WebSocket URL. `ws://`, `wss://`, `http(s)://` or bare `host:port` are accepted. |
-| `pollIntervalMs` | 100 | CDS subscription interval |
-| `tlsSkipVerify` | false | Accept self-signed certificates for `wss://` |
-
-No secrets: the CDS has no authentication.
+| `jsonData.connectionMode` | `direct` if unset; editor sets `proxy` for new data sources | `proxy` (OpenRVDAS API) or `direct` (legacy CDS) |
+| `jsonData.url` | (required) | Proxy or CDS WebSocket URL. `ws://`, `wss://`, `http(s)://` or bare `host:port` are accepted. |
+| `jsonData.pollIntervalMs` | 100 | CDS subscription interval |
+| `jsonData.tlsSkipVerify` | false | Accept self-signed certificates for `wss://` |
+| `secureJsonData.apiKey` | (required in proxy mode) | OpenRVDAS API key with the `WEBSOCKET` permission |
 
 Query model:
 
@@ -213,7 +264,9 @@ Query model:
 - **Frontend APIs.** The frontend only uses APIs that exist across that
   range. Live streaming via `meta.channel` predates Grafana 12, and
   `MultiCombobox` is available in 12.0.
-- **CDS.** Any version with the WebSocket API.
+- **CDS.** Direct mode works with any CDS version that has the WebSocket
+  API. Proxy mode needs an OpenRVDAS version whose API has
+  `/api/v1/ws/data-server` with API-key support.
 
 ## Testing
 
@@ -221,7 +274,8 @@ Query model:
 |---|---|---|
 | Go unit | `pkg/plugin/*_test.go` | Channel escaping, wildcard expansion, type inference, frames, units |
 | Go protocol | `pkg/cds/manager_test.go` | In-process fake CDS: subscribe, de-dup across re-subscribe, unsubscribe/close, reconnect |
-| Go integration | `pkg/cds/integration_test.go` | `CDS_URL=ws://host:8766 go test -tags integration ./pkg/cds/` |
+| Go protocol (proxy) | `pkg/cds/proxy_test.go`, `pkg/plugin/health_test.go` | API key header, 403/404 handshake errors, proxy `error` messages, health-check messages per mode |
+| Go integration | `pkg/cds/integration_test.go` | `CDS_URL=… [OPENRVDAS_API_KEY=…] go test -tags integration ./pkg/cds/`; `OPENRVDAS_PROXY_URL=…` checks that bad keys are rejected |
 | E2E | `tests/*.spec.ts` | Config editor, query editor, and live messages reaching the browser on the provisioned dashboard |
 
 ## Known limitations and future work

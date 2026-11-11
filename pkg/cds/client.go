@@ -75,10 +75,21 @@ type Metadata struct {
 
 // Message is a raw message from the server.
 type Message struct {
-	Type   string          `json:"type"`
-	Status int             `json:"status"`
-	Error  string          `json:"error"`
-	Data   json.RawMessage `json:"data"`
+	Type   string `json:"type"`
+	Status int    `json:"status"`
+	// The CDS reports problems in "error"; the OpenRVDAS API proxy uses
+	// "message" (e.g. {"type":"error","status":503,"message":...}).
+	Error   string          `json:"error"`
+	Message string          `json:"message"`
+	Data    json.RawMessage `json:"data"`
+}
+
+// ErrorText returns the server's description of a failed request.
+func (m *Message) ErrorText() string {
+	if m.Error != "" {
+		return m.Error
+	}
+	return m.Message
 }
 
 // FieldSpec is the per-field part of a subscribe request.
@@ -94,6 +105,36 @@ type Options struct {
 	URL string
 	// TLSSkipVerify disables certificate verification for wss:// URLs.
 	TLSSkipVerify bool
+	// APIKey, if set, is sent in the X-API-Key header of the WebSocket
+	// handshake, as the OpenRVDAS API proxy expects. A header rather than
+	// the ?api_key= query parameter keeps the key out of access logs.
+	APIKey string
+}
+
+// APIKeyHeader is the handshake header carrying the API key.
+const APIKeyHeader = "X-API-Key"
+
+// HandshakeError is returned by Dial when the server answered the WebSocket
+// handshake with an HTTP error instead of upgrading the connection. The
+// OpenRVDAS API proxy rejects missing, invalid, revoked or expired keys,
+// and keys without the WEBSOCKET permission, with 403.
+type HandshakeError struct {
+	URL        string
+	StatusCode int
+	Err        error
+}
+
+func (e *HandshakeError) Error() string {
+	return fmt.Sprintf("%s rejected the WebSocket connection: HTTP %d %s",
+		e.URL, e.StatusCode, http.StatusText(e.StatusCode))
+}
+
+func (e *HandshakeError) Unwrap() error { return e.Err }
+
+// IsAuthFailure reports whether the rejection means the credentials were
+// missing or not accepted.
+func (e *HandshakeError) IsAuthFailure() bool {
+	return e.StatusCode == http.StatusUnauthorized || e.StatusCode == http.StatusForbidden
 }
 
 // Conn is a single WebSocket connection to a CDS. It is not safe for
@@ -131,6 +172,9 @@ func Dial(ctx context.Context, opts Options) (*Conn, error) {
 		return nil, err
 	}
 	dialOpts := &websocket.DialOptions{}
+	if opts.APIKey != "" {
+		dialOpts.HTTPHeader = http.Header{APIKeyHeader: {opts.APIKey}}
+	}
 	if opts.TLSSkipVerify {
 		dialOpts.HTTPClient = &http.Client{
 			Transport: &http.Transport{
@@ -139,9 +183,12 @@ func Dial(ctx context.Context, opts Options) (*Conn, error) {
 			},
 		}
 	}
-	ws, _, err := websocket.Dial(ctx, u, dialOpts)
+	ws, resp, err := websocket.Dial(ctx, u, dialOpts)
 	if err != nil {
-		return nil, fmt.Errorf("connect to CDS at %s: %w", u, err)
+		if resp != nil && resp.StatusCode != http.StatusSwitchingProtocols {
+			return nil, &HandshakeError{URL: u, StatusCode: resp.StatusCode, Err: err}
+		}
+		return nil, fmt.Errorf("connect to %s: %w", u, err)
 	}
 	ws.SetReadLimit(readLimit)
 	return &Conn{ws: ws}, nil
@@ -168,9 +215,9 @@ func (c *Conn) Recv(ctx context.Context) (*Message, error) {
 
 // request sends req and returns the next message whose type matches
 // wantType, skipping anything else (e.g. stray data messages). Errors come
-// back either untyped or typed with the request's own type (a failed
-// "ready" is answered with {"type":"ready","status":400}), so those are
-// accepted too.
+// back untyped, typed with the request's own type (a failed "ready" is
+// answered with {"type":"ready","status":400}), or, from the OpenRVDAS API
+// proxy, typed "error", so those are accepted too.
 func (c *Conn) request(ctx context.Context, req map[string]any, wantType string) (*Message, error) {
 	if err := c.Send(ctx, req); err != nil {
 		return nil, err
@@ -181,11 +228,11 @@ func (c *Conn) request(ctx context.Context, req map[string]any, wantType string)
 		if err != nil {
 			return nil, err
 		}
-		if m.Type != wantType && m.Type != reqType && m.Type != "" {
+		if m.Type != wantType && m.Type != reqType && m.Type != "" && m.Type != "error" {
 			continue
 		}
-		if m.Status != 200 {
-			return nil, fmt.Errorf("CDS %s request failed (status %d): %s", wantType, m.Status, m.Error)
+		if m.Status != 200 || m.Type == "error" {
+			return nil, fmt.Errorf("%s request failed (status %d): %s", reqType, m.Status, m.ErrorText())
 		}
 		return m, nil
 	}

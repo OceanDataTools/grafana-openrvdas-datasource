@@ -1,5 +1,16 @@
 apiVersion: 1
 
+# Values come from the environment (see docker-compose.yaml); put them in a
+# git-ignored .env file:
+#
+#   Direct (legacy, unauthenticated):
+#     CDS_URL=ws://<host>:8766
+#
+#   OpenRVDAS API (authenticated):
+#     CDS_CONNECTION_MODE=proxy
+#     CDS_URL=wss://<host>/api/v1/ws/data-server
+#     OPENRVDAS_API_KEY=<key with the WEBSOCKET permission>
+
 datasources:
   - name: 'OpenRVDAS'
     uid: 'openrvdas-dev'
@@ -10,6 +21,8 @@ datasources:
     version: 1
     editable: true
     jsonData:
-      # Override with CDS_URL when starting docker compose to point at another server.
+      connectionMode: '${CDS_CONNECTION_MODE}'
       url: '${CDS_URL}'
       pollIntervalMs: 100
+    secureJsonData:
+      apiKey: '${OPENRVDAS_API_KEY}'
