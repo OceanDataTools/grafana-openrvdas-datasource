@@ -1,0 +1,9 @@
+services:
+  grafana:
+    extends:
+      file: .config/docker-compose-base.yaml
+      service: grafana
+    environment:
+      # CachedDataServer used by the provisioned data source. Set it in a
+      # git-ignored .env file (CDS_URL=ws://host:8766) or the environment.
+      CDS_URL: ${CDS_URL:-ws://host.docker.internal:8766}

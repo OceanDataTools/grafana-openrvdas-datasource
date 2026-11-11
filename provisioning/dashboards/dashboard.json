@@ -1,0 +1,152 @@
+{
+  "uid": "openrvdas-live",
+  "title": "OpenRVDAS live",
+  "editable": true,
+  "schemaVersion": 39,
+  "time": {
+    "from": "now-5m",
+    "to": "now"
+  },
+  "refresh": "",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Heading",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      },
+      "datasource": {
+        "type": "oceandatatools-openrvdas-datasource",
+        "uid": "openrvdas-dev"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "oceandatatools-openrvdas-datasource",
+            "uid": "openrvdas-dev"
+          },
+          "fields": [
+            "S330HeadingTrue"
+          ]
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "colorMode": "none"
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Air temperature",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      },
+      "datasource": {
+        "type": "oceandatatools-openrvdas-datasource",
+        "uid": "openrvdas-dev"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "oceandatatools-openrvdas-datasource",
+            "uid": "openrvdas-dev"
+          },
+          "fields": [
+            "MwxAirTemp"
+          ]
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "area",
+        "colorMode": "none"
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Roll and pitch",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "datasource": {
+        "type": "oceandatatools-openrvdas-datasource",
+        "uid": "openrvdas-dev"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "oceandatatools-openrvdas-datasource",
+            "uid": "openrvdas-dev"
+          },
+          "fields": [
+            "S330Roll",
+            "S330Pitch"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "S330 (wildcard, 1 s min interval)",
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 6
+      },
+      "datasource": {
+        "type": "oceandatatools-openrvdas-datasource",
+        "uid": "openrvdas-dev"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "oceandatatools-openrvdas-datasource",
+            "uid": "openrvdas-dev"
+          },
+          "fields": [
+            "S330Speed*",
+            "S330Course*"
+          ],
+          "minIntervalMs": 1000
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "colorMode": "none",
+        "textMode": "value_and_name"
+      }
+    }
+  ]
+}

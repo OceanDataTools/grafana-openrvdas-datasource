@@ -1,0 +1,15 @@
+apiVersion: 1
+
+datasources:
+  - name: 'OpenRVDAS'
+    uid: 'openrvdas-dev'
+    type: 'oceandatatools-openrvdas-datasource'
+    access: proxy
+    isDefault: true
+    orgId: 1
+    version: 1
+    editable: true
+    jsonData:
+      # Override with CDS_URL when starting docker compose to point at another server.
+      url: '${CDS_URL}'
+      pollIntervalMs: 100
