@@ -42,7 +42,7 @@ func NewDatasource(_ context.Context, settings backend.DataSourceInstanceSetting
 	if err != nil {
 		return nil, err
 	}
-	opts := cds.Options{URL: cfg.URL, TLSSkipVerify: cfg.TLSSkipVerify}
+	opts := cds.Options{URL: cfg.URL, TLSSkipVerify: cfg.TLSSkipVerify, APIKey: cfg.EffectiveAPIKey()}
 	return &Datasource{
 		uid:      settings.UID,
 		settings: cfg,
@@ -89,15 +89,19 @@ func (q queryModel) streaming() bool { return q.Stream == nil || *q.Stream }
 // lazyConn opens a CDS connection on first use and is shared by all queries
 // of one QueryData request.
 type lazyConn struct {
-	opts cds.Options
-	conn *cds.Conn
+	opts     cds.Options
+	settings *models.PluginSettings
+	conn     *cds.Conn
 }
 
 func (l *lazyConn) get(ctx context.Context) (*cds.Conn, error) {
 	if l.conn == nil {
+		if err := l.settings.Validate(); err != nil {
+			return nil, err
+		}
 		c, err := cds.Dial(ctx, l.opts)
 		if err != nil {
-			return nil, err
+			return nil, errors.New(connectErrorMessage(err, l.settings))
 		}
 		l.conn = c
 	}
@@ -118,7 +122,7 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 	response := backend.NewQueryDataResponse()
 	ctx, cancel := context.WithTimeout(ctx, requestTimeout)
 	defer cancel()
-	conn := &lazyConn{opts: d.opts}
+	conn := &lazyConn{opts: d.opts, settings: d.settings}
 	defer conn.close()
 
 	for _, q := range req.Queries {
@@ -370,7 +374,7 @@ func (d *Datasource) CallResource(ctx context.Context, req *backend.CallResource
 	}
 	ctx, cancel := context.WithTimeout(ctx, requestTimeout)
 	defer cancel()
-	conn := &lazyConn{opts: d.opts}
+	conn := &lazyConn{opts: d.opts, settings: d.settings}
 	defer conn.close()
 	fields, err := d.availableFields(ctx, conn)
 	if err != nil {
@@ -379,10 +383,36 @@ func (d *Datasource) CallResource(ctx context.Context, req *backend.CallResource
 	return reply(http.StatusOK, map[string]any{"fields": fields})
 }
 
-// CheckHealth connects to the CDS and lists its fields.
+// connectErrorMessage explains a failed connection in terms of the
+// configured connection mode.
+func connectErrorMessage(err error, s *models.PluginSettings) string {
+	var hs *cds.HandshakeError
+	if !errors.As(err, &hs) {
+		return fmt.Sprintf("Could not connect to the %s: %v", s.ModeName(), err)
+	}
+	switch {
+	case hs.IsAuthFailure() && s.Mode() == models.ConnectionProxy:
+		return fmt.Sprintf("Authentication failed (HTTP %d): the API key is invalid, revoked or expired, "+
+			"or lacks the WEBSOCKET permission on /api/v1/ws/data-server. Check the key on the "+
+			"API Keys page of the OpenRVDAS web UI.", hs.StatusCode)
+	case hs.IsAuthFailure():
+		return fmt.Sprintf("%s refused the connection (HTTP %d). If this is the OpenRVDAS API, "+
+			"set Connection to \"OpenRVDAS API\" and enter an API key.", hs.URL, hs.StatusCode)
+	case hs.StatusCode == http.StatusNotFound && s.Mode() == models.ConnectionProxy:
+		return fmt.Sprintf("No WebSocket endpoint at %s (HTTP 404). The URL should end in "+
+			"/api/v1/ws/data-server; OpenRVDAS installations without the API proxy need a Direct connection.", hs.URL)
+	default:
+		return hs.Error()
+	}
+}
+
+// CheckHealth connects and lists the available fields.
 func (d *Datasource) CheckHealth(ctx context.Context, _ *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	fail := func(msg string) (*backend.CheckHealthResult, error) {
 		return &backend.CheckHealthResult{Status: backend.HealthStatusError, Message: msg}, nil
+	}
+	if err := d.settings.Validate(); err != nil {
+		return fail(err.Error())
 	}
 	u, err := cds.NormalizeURL(d.settings.URL)
 	if err != nil {
@@ -392,16 +422,18 @@ func (d *Datasource) CheckHealth(ctx context.Context, _ *backend.CheckHealthRequ
 	defer cancel()
 	conn, err := cds.Dial(ctx, d.opts)
 	if err != nil {
-		return fail(err.Error())
+		return fail(connectErrorMessage(err, d.settings))
 	}
 	defer conn.Close()
 	fields, err := conn.Fields(ctx)
 	if err != nil {
-		return fail(fmt.Sprintf("Connected to %s but the fields request failed: %v", u, err))
+		return fail(fmt.Sprintf("Connected to the %s at %s, but the fields request failed: %v",
+			d.settings.ModeName(), u, err))
 	}
-	return &backend.CheckHealthResult{
-		Status: backend.HealthStatusOk,
-		Message: fmt.Sprintf("Connected to CachedDataServer at %s: %d fields available (streaming every %s)",
-			u, len(fields), d.settings.PollInterval()),
-	}, nil
+	msg := fmt.Sprintf("Connected to the %s at %s: %d fields available (streaming every %s)",
+		d.settings.ModeName(), u, len(fields), d.settings.PollInterval())
+	if d.settings.Mode() == models.ConnectionDirect {
+		msg += ". Direct connections are unauthenticated and are scheduled for removal in OpenRVDAS v3."
+	}
+	return &backend.CheckHealthResult{Status: backend.HealthStatusOk, Message: msg}, nil
 }

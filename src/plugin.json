@@ -12,13 +12,7 @@
       "name": "OceanDataTools.org",
       "url": "https://oceandatatools.github.io"
     },
-    "keywords": [
-      "datasource",
-      "openrvdas",
-      "streaming",
-      "oceanography",
-      "realtime"
-    ],
+    "keywords": ["datasource", "openrvdas", "streaming", "oceanography", "realtime"],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"

@@ -2,7 +2,11 @@ import { test, expect } from '@grafana/plugin-e2e';
 
 // Verifies the full path CDS -> Go backend -> Grafana Live -> browser using
 // the provisioned dashboard. Needs a CDS with live data (CDS_URL in .env).
-test('provisioned dashboard receives live stream messages', async ({ gotoDashboardPage, readProvisionedDashboard, page }) => {
+test('provisioned dashboard receives live stream messages', async ({
+  gotoDashboardPage,
+  readProvisionedDashboard,
+  page,
+}) => {
   const channel = 'ds/openrvdas-dev/f/0/S330HeadingTrue';
   let messages = 0;
   page.on('websocket', (ws) => {

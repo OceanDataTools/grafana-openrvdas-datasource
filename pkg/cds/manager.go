@@ -393,11 +393,15 @@ func (m *Manager) session() error {
 				}
 			case "subscribe":
 				if r.msg.Status != 200 {
-					return fmt.Errorf("CDS rejected subscription (status %d): %s", r.msg.Status, r.msg.Error)
+					return fmt.Errorf("CDS rejected subscription (status %d): %s", r.msg.Status, r.msg.ErrorText())
 				}
+			case "error":
+				// From the OpenRVDAS API proxy, e.g. 503 "CachedDataServer
+				// unavailable"; it closes the connection next.
+				return fmt.Errorf("server error (status %d): %s", r.msg.Status, r.msg.ErrorText())
 			default:
 				if r.msg.Status != 200 {
-					m.log.Warn("CDS error message", "status", r.msg.Status, "error", r.msg.Error)
+					m.log.Warn("CDS error message", "status", r.msg.Status, "error", r.msg.ErrorText())
 				}
 			}
 		}
