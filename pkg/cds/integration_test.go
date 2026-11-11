@@ -1,29 +1,51 @@
 //go:build integration
 
-// Integration tests against a real CachedDataServer. Run with:
+// Integration tests against a real CachedDataServer, directly or through
+// the OpenRVDAS API proxy. Run with:
 //
 //	CDS_URL=ws://host:8766 go test -tags integration -v ./pkg/cds/
+//	CDS_URL=wss://host/api/v1/ws/data-server OPENRVDAS_API_KEY=... go test -tags integration -v ./pkg/cds/
+//
+// TestIntegrationProxyRejectsBadKey only needs OPENRVDAS_PROXY_URL.
 package cds
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
 	"time"
 )
 
-func cdsURL(t *testing.T) string {
+func cdsOptions(t *testing.T) Options {
 	u := os.Getenv("CDS_URL")
 	if u == "" {
 		t.Skip("CDS_URL not set")
 	}
-	return u
+	return Options{URL: u, APIKey: os.Getenv("OPENRVDAS_API_KEY")}
+}
+
+func TestIntegrationProxyRejectsBadKey(t *testing.T) {
+	u := os.Getenv("OPENRVDAS_PROXY_URL")
+	if u == "" {
+		t.Skip("OPENRVDAS_PROXY_URL not set")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	for _, key := range []string{"", "not-a-real-key"} {
+		_, err := Dial(ctx, Options{URL: u, APIKey: key})
+		var hs *HandshakeError
+		if !errors.As(err, &hs) || !hs.IsAuthFailure() {
+			t.Fatalf("key %q: expected an auth failure, got %v", key, err)
+		}
+		t.Logf("key %q rejected: %v", key, hs)
+	}
 }
 
 func TestIntegrationOneShots(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	c, err := Dial(ctx, Options{URL: cdsURL(t)})
+	c, err := Dial(ctx, cdsOptions(t))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +72,7 @@ func TestIntegrationStreamRate(t *testing.T) {
 	if field == "" {
 		field = "S330HeadingTrue"
 	}
-	m := NewManager(Options{URL: cdsURL(t)}, 100*time.Millisecond, nopLogger{})
+	m := NewManager(cdsOptions(t), 100*time.Millisecond, nopLogger{})
 	defer m.Close()
 	s, err := m.Subscribe(field)
 	if err != nil {

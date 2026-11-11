@@ -20,9 +20,21 @@ export const DEFAULT_QUERY: Partial<OpenRVDASQuery> = {
   stream: true,
 };
 
+/**
+ * How the plugin reaches the CachedDataServer:
+ * - `proxy`: through the OpenRVDAS API's authenticated, read-only proxy
+ *   (wss://<host>/api/v1/ws/data-server) with an API key.
+ * - `direct`: straight to the CDS (ws://<host>:8766), unauthenticated.
+ *   Slated for removal in OpenRVDAS v3.
+ * Unset means `direct`, so data sources created before this setting existed
+ * keep working; the config editor sets `proxy` for new data sources.
+ */
+export type ConnectionMode = 'proxy' | 'direct';
+
 /** Options configured for each data source instance (stored in jsonData). */
 export interface OpenRVDASDataSourceOptions extends DataSourceJsonData {
-  /** CachedDataServer WebSocket URL, e.g. ws://openrvdas.local:8766 */
+  connectionMode?: ConnectionMode;
+  /** WebSocket URL of the OpenRVDAS API proxy or the CachedDataServer. */
   url?: string;
   /** CDS subscription interval in milliseconds (default 100 = 10 Hz). */
   pollIntervalMs?: number;
@@ -31,3 +43,9 @@ export interface OpenRVDASDataSourceOptions extends DataSourceJsonData {
 }
 
 export const DEFAULT_POLL_INTERVAL_MS = 100;
+
+/** Secrets, stored encrypted by Grafana and only readable by the backend. */
+export interface OpenRVDASSecureJsonData {
+  /** OpenRVDAS API key with the WEBSOCKET permission on /api/v1/ws/data-server. */
+  apiKey?: string;
+}
