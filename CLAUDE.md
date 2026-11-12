@@ -32,6 +32,12 @@ Backend (`pkg/`):
 
 Frontend (`src/`) is thin: `DataSourceWithBackend` auto-subscribes to `meta.channel` frames, so there is no custom streaming code. The query editor uses `MultiCombobox` with custom values for wildcard patterns.
 
+## Docs
+
+- `docs/DESIGN.md`: architecture and the reasons behind it. Keep it current.
+- `docs/INSTALL-DEV.md`: installing an unsigned development build into an existing Grafana. Temporary: delete it, and its link in the root README, once the plugin is in the Grafana catalog.
+- `src/README.md` is the catalog page and ships in `dist/`. The root README repeats it and adds development notes.
+
 ## Invariants
 
 - **Value column name.** It must equal the CDS field name: OceanDataTools panels match `field.name`.

@@ -13,6 +13,10 @@ This data source is for **live** data only. For historical data, use the databas
   - the OpenRVDAS API (recommended), which provides an authenticated proxy at `/api/v1/ws/data-server`, plus an API key, or
   - direct network access to the CachedDataServer (port 8766). This is unauthenticated and scheduled for removal in OpenRVDAS v3.
 
+## Installation
+
+Until the plugin is in the Grafana plugin catalog, install a development build by hand. See [docs/INSTALL-DEV.md](docs/INSTALL-DEV.md) for building, installing into an existing Grafana (Linux, Docker, macOS, Windows), allowing the unsigned plugin, configuring a reverse proxy for live streaming, and troubleshooting.
+
 ## Configuration
 
 | Setting | Description |
