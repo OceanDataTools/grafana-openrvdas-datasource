@@ -19,8 +19,19 @@ You can build on any machine. A full build contains backends for every
 supported platform: Linux amd64, arm64 and arm, macOS amd64 and arm64, and
 Windows amd64.
 
-Prerequisites: Node 22 (see `.nvmrc`), Go (see `go.mod`), and
-[mage](https://magefile.org) (`go install github.com/magefile/mage@latest`).
+Prerequisites:
+
+- **Node 24.5 or newer** (`.nvmrc` and `package.json` `engines`). Distribution
+  packages are often older. `nvm install` (which reads `.nvmrc`) or
+  [NodeSource](https://github.com/nodesource/distributions) work.
+- **Go, at the version in `go.mod`** (currently 1.26.5). On Ubuntu 24.04 the
+  `golang` package is 1.22, which is too old, and Ubuntu's Go doesn't download
+  newer toolchains by default. Install Go from [go.dev](https://go.dev/dl/), or
+  run `export GOTOOLCHAIN=auto` first so Go fetches the toolchain `go.mod`
+  asks for.
+- **[mage](https://magefile.org)**: `go install github.com/magefile/mage@latest`.
+  This puts `mage` in `$(go env GOPATH)/bin` (usually `~/go/bin`), which may
+  not be on your `PATH`: `export PATH="$PATH:$(go env GOPATH)/bin"`.
 
 ```bash
 git clone https://github.com/OceanDataTools/grafana-openrvdas-datasource.git

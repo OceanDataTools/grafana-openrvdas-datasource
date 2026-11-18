@@ -11,7 +11,7 @@ This data source is for **live** data only. For historical data, use the databas
 - Grafana 12.0.10 or newer (12.0.10+, 12.1.7+, 12.2.5+, 13.x)
 - An OpenRVDAS server reachable **from the Grafana server**. Browsers don't need direct access to it. Either:
   - the OpenRVDAS API (recommended), which provides an authenticated proxy at `/api/v1/ws/data-server`, plus an API key, or
-  - direct network access to the CachedDataServer (port 8766). This is unauthenticated and scheduled for removal in OpenRVDAS v3.
+  - direct network access to the CachedDataServer (port 8766). This is unauthenticated and scheduled for removal in OpenRVDAS v3 ([openrvdas#748](https://github.com/OceanDataTools/openrvdas/issues/748)).
 
 ## Installation
 
@@ -31,7 +31,9 @@ Until the plugin is in the Grafana plugin catalog, install a development build b
 
 ### Creating an API key
 
-In the OpenRVDAS web UI, open the **API Keys** page and create a key with the **WEBSOCKET** permission on `/api/v1/ws/data-server`. Paste it into the data source's **API key** field. The plugin only reads data and never needs write permissions.
+API keys need the OpenRVDAS **React** web console, which provides the API. Switch an installation to it with `utils/switch_ui.sh react` in OpenRVDAS. With the Django console there's no API and no API keys, so use the **Direct** connection.
+
+In the React web console, open the **API Keys** page and create a key with the **WEBSOCKET** permission on `/api/v1/ws/data-server`. Paste it into the data source's **API key** field. The plugin only reads data and never needs write permissions.
 
 Grafana stores the key encrypted. Only the Grafana server uses it, sending it in the `X-API-Key` header when connecting, so browsers never see it.
 
