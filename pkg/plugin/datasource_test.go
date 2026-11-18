@@ -3,6 +3,7 @@ package plugin
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 
@@ -106,6 +107,77 @@ func TestGrafanaUnit(t *testing.T) {
 	} {
 		if got := grafanaUnit(in); got != want {
 			t.Errorf("grafanaUnit(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestStaleNotice(t *testing.T) {
+	now := time.Date(2026, 11, 18, 12, 0, 0, 0, time.UTC)
+	from := now.Add(-5 * time.Minute)
+	at := func(d time.Duration) cds.Point {
+		return cds.Point{Time: float64(now.Add(-d).UnixNano()) / 1e9, Value: 1.0}
+	}
+
+	t.Run("fresh values: no notice", func(t *testing.T) {
+		latest := map[string]cds.Point{"A": at(10 * time.Second)}
+		if text, ok := staleNotice([]string{"A"}, latest, from, now); ok {
+			t.Fatalf("unexpected notice %q", text)
+		}
+	})
+
+	t.Run("one stale field", func(t *testing.T) {
+		latest := map[string]cds.Point{
+			"AvgPortTrueWindSpeed": at(23 * time.Hour),
+			"Fresh":                at(time.Second),
+		}
+		text, ok := staleNotice([]string{"AvgPortTrueWindSpeed", "Fresh"}, latest, from, now)
+		want := "Latest value is older than the selected time range for: AvgPortTrueWindSpeed (23 h old). Is its logger running?"
+		if !ok || text != want {
+			t.Fatalf("got %q, %v; want %q", text, ok, want)
+		}
+	})
+
+	t.Run("several stale fields keep query order", func(t *testing.T) {
+		latest := map[string]cds.Point{
+			"B": at(3 * 24 * time.Hour),
+			"A": at(12 * time.Minute),
+		}
+		text, ok := staleNotice([]string{"A", "B", "Absent"}, latest, from, now)
+		want := "Latest value is older than the selected time range for: A (12 min old), B (3 d old). Are their loggers running?"
+		if !ok || text != want {
+			t.Fatalf("got %q, %v; want %q", text, ok, want)
+		}
+	})
+
+	t.Run("value exactly at the range start is in range", func(t *testing.T) {
+		latest := map[string]cds.Point{"A": at(5 * time.Minute)}
+		if text, ok := staleNotice([]string{"A"}, latest, from, now); ok {
+			t.Fatalf("unexpected notice %q", text)
+		}
+	})
+
+	t.Run("no time range: no notice", func(t *testing.T) {
+		latest := map[string]cds.Point{"A": at(48 * time.Hour)}
+		if text, ok := staleNotice([]string{"A"}, latest, time.Time{}, now); ok {
+			t.Fatalf("unexpected notice %q", text)
+		}
+	})
+}
+
+func TestFormatAge(t *testing.T) {
+	for _, tc := range []struct {
+		d    time.Duration
+		want string
+	}{
+		{45 * time.Second, "45 s"},
+		{59*time.Minute + 59*time.Second, "59 min"},
+		{time.Hour, "1 h"},
+		{47 * time.Hour, "47 h"},
+		{48 * time.Hour, "2 d"},
+		{10*24*time.Hour + 5*time.Hour, "10 d"},
+	} {
+		if got := formatAge(tc.d); got != tc.want {
+			t.Errorf("formatAge(%v) = %q, want %q", tc.d, got, tc.want)
 		}
 	}
 }

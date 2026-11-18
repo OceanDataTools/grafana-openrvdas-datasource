@@ -212,7 +212,58 @@ func (d *Datasource) query(ctx context.Context, conn *lazyConn, query backend.Da
 			Text:     "No cached value yet for: " + strings.Join(absent, ", "),
 		})
 	}
+	if text, ok := staleNotice(fields, latest, query.TimeRange.From, time.Now()); ok && len(resp.Frames) > 0 {
+		resp.Frames[0].AppendNotices(data.Notice{
+			Severity: data.NoticeSeverityWarning,
+			Text:     text,
+		})
+	}
 	return resp
+}
+
+// staleNotice explains latest values older than the start of the query's
+// time range. The CDS returns a field's last cached value however old it is,
+// so when no logger is writing the field, a time series panel shows only
+// "Data outside time range", which looks like a plugin problem rather than a
+// stopped logger.
+func staleNotice(fields []string, latest map[string]cds.Point, from, now time.Time) (string, bool) {
+	if from.IsZero() {
+		return "", false
+	}
+	var stale []string
+	for _, f := range fields {
+		p, ok := latest[f]
+		if !ok {
+			continue
+		}
+		t := p.Timestamp()
+		if t.Before(from) {
+			stale = append(stale, fmt.Sprintf("%s (%s old)", f, formatAge(now.Sub(t))))
+		}
+	}
+	if len(stale) == 0 {
+		return "", false
+	}
+	question := "Is its logger running?"
+	if len(stale) > 1 {
+		question = "Are their loggers running?"
+	}
+	return "Latest value is older than the selected time range for: " +
+		strings.Join(stale, ", ") + ". " + question, true
+}
+
+// formatAge renders a duration coarsely: "45 s", "12 min", "23 h", "3 d".
+func formatAge(d time.Duration) string {
+	switch {
+	case d < time.Minute:
+		return fmt.Sprintf("%d s", int(d.Seconds()))
+	case d < time.Hour:
+		return fmt.Sprintf("%d min", int(d.Minutes()))
+	case d < 48*time.Hour:
+		return fmt.Sprintf("%d h", int(d.Hours()))
+	default:
+		return fmt.Sprintf("%d d", int(d.Hours()/24))
+	}
 }
 
 // availableFields returns the CDS field list, cached briefly.
