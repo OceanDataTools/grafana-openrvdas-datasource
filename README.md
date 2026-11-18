@@ -43,6 +43,8 @@ Grafana stores the key encrypted. Only the Grafana server uses it, sending it in
 
 Each field becomes its own series, named after the field, with units and descriptions taken from OpenRVDAS metadata when available.
 
+If a field's latest value is older than the start of the panel's time range, the panel shows a warning with the value's age (e.g. *AvgPortTrueWindSpeed (23 h old). Is its logger running?*). Grafana would otherwise show only "Data outside time range". The CachedDataServer keeps a field's last value after its logger stops, so this usually means the logger isn't running.
+
 ## Tips for live dashboards
 
 - Leave the dashboard's auto-refresh **off**. Streaming panels update themselves, and auto-refresh only re-runs the initial query.
