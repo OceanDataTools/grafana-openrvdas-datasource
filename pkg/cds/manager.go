@@ -294,7 +294,7 @@ func (m *Manager) session() error {
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	m.log.Info("Connected to CDS", "url", m.opts.URL, "interval", m.interval.String())
 
 	msgs := make(chan recvResult, 1)

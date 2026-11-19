@@ -1,0 +1,7 @@
+# Only the CDS simulator (cmd/cds-sim/Dockerfile) builds from the repo root;
+# the Grafana image builds from .config/. Send it just the Go sources.
+*
+!go.mod
+!go.sum
+!pkg/
+!cmd/

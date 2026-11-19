@@ -17,8 +17,9 @@ A Grafana backend data source plugin (`oceandatatools-openrvdas-datasource`) tha
 - `npm run typecheck`, `npm run lint`, `npm run test:ci`: frontend checks
 - `go vet ./pkg/... && go test -race ./pkg/...`: backend unit tests, including a fake CDS for protocol tests
 - `CDS_URL=… [OPENRVDAS_API_KEY=…] [OPENRVDAS_PROXY_URL=…] go test -tags integration -v ./pkg/cds/`: against a real CDS or proxy
-- `npm run server`: Grafana in Docker with the provisioned data source and "OpenRVDAS live" dashboard. The connection comes from a git-ignored `.env`: `CDS_URL`, plus `CDS_CONNECTION_MODE=proxy` and `OPENRVDAS_API_KEY` for the OpenRVDAS API. `GRAFANA_VERSION=12.0.10 npm run server` tests the oldest supported Grafana.
-- `npm run e2e`: Playwright. Needs built `dist/`, the server running, and a CDS with live data.
+- `npm run server`: Grafana in Docker with the provisioned data source and "OpenRVDAS live" dashboard, plus `cds-sim`, the bundled CDS simulator the data source uses by default (proxy mode, dummy key). To use a real OpenRVDAS, set `CDS_URL`, `CDS_CONNECTION_MODE` and `OPENRVDAS_API_KEY` in a git-ignored `.env`. `GRAFANA_VERSION=12.0.10 npm run server` tests the oldest supported Grafana.
+- `npm run e2e`: Playwright. Needs built `dist/` and the server running (simulator or a live CDS).
+- CI (`.github/workflows/ci.yml`) runs on PRs and pushes to `dev` and `main`; `release.yml` runs on `vX.Y.Z` tags.
 
 ## Architecture
 
@@ -29,8 +30,16 @@ Backend (`pkg/`):
 - `pkg/plugin/datasource.go`: `QueryData` returns one frame per field with its latest value and `meta.channel` set. `RunStream` forwards one field per Live channel. Also `CheckHealth`, and the `CallResource` `GET fields` route used by the query editor.
 - `pkg/plugin/channel.go`: Live channel path `f/<minIntervalMs>/<escaped field>`. Live paths only allow `[A-z0-9_\-/=.]`, so other bytes are `=XX` escaped.
 - `pkg/plugin/frames.go`: type inference, frame building, unit mapping, glob expansion.
+- `pkg/cdssim`, `cmd/cds-sim`: CDS simulator for the docker compose test environment and CI e2e. Not part of the plugin. The e2e tests and provisioned dashboard depend on its field names and units.
 
 Frontend (`src/`) is thin: `DataSourceWithBackend` auto-subscribes to `meta.channel` frames, so there is no custom streaming code. The query editor uses `MultiCombobox` with custom values for wildcard patterns.
+
+## Docs
+
+- `docs/DESIGN.md`: architecture and the reasons behind it. Keep it current.
+- `docs/INSTALL-DEV.md`: installing an unsigned development build into an existing Grafana. Temporary: delete it, and its link in `CONTRIBUTING.md`, once the plugin is in the Grafana catalog.
+- `src/README.md` is the catalog page and ships in `dist/`. The root `README.md` is an identical copy. Use only absolute links, and keep installation, build and development instructions out of both: Grafana's review rejects READMEs that contain them. Those go in `CONTRIBUTING.md`.
+- `CHANGELOG.md`: user-facing changes only, in the sibling panels' format (`## X.Y.Z - YYYY-MM-DD`, Added/Fixed/Changed/Breaking, PR links).
 
 ## Invariants
 

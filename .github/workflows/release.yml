@@ -1,5 +1,7 @@
-# This GitHub Action automates the process of building Grafana plugins.
-# (For more information, see https://github.com/grafana/plugin-actions/blob/main/build-plugin/README.md)
+# Builds, packages and (once GRAFANA_ACCESS_POLICY_TOKEN is set) signs the
+# plugin, then creates a draft GitHub release with the zip and its sha1 for
+# the Grafana plugin catalog submission form. Triggered by a vX.Y.Z tag on
+# main. See https://grafana.com/developers/plugin-tools/publish-a-plugin/build-automation
 name: Release
 
 on:
@@ -12,18 +14,24 @@ permissions: read-all
 jobs:
   release:
     permissions:
+      id-token: write
       contents: write
+      attestations: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
-      - uses: grafana/plugin-actions/build-plugin@build-plugin/v1.2.0
-        # Uncomment to enable plugin signing
-        # (For more info on how to generate the access policy token see https://grafana.com/developers/plugin-tools/publish-a-plugin/sign-a-plugin#generate-an-access-policy-token)
-        #with:
-        # Make sure to save the token in your repository secrets
-        #policy_token: $
-        # Usage of GRAFANA_API_KEY is deprecated, prefer `policy_token` option above
-        #grafana_token: $
+      - uses: grafana/plugin-actions/build-plugin@build-plugin/v2.0.2
+        with:
+          # The action defaults to older versions than go.mod and package.json need.
+          go-version: '1.26.5'
+          node-version: '24'
+          # Unset until Grafana approves the plugin: the build is unsigned and
+          # the action prints a reminder. After approval, create an access
+          # policy token (scope plugins:write) and save it as this secret:
+          # https://grafana.com/developers/plugin-tools/publish-a-plugin/sign-a-plugin#generate-an-access-policy-token
+          policy_token: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
+          # Signed build provenance attestation for the plugin zip.
+          attestation: true

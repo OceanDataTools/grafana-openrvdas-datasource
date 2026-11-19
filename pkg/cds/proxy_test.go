@@ -41,7 +41,7 @@ func TestDialSendsAPIKeyHeader(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Close()
+	defer func() { _ = c.Close() }()
 	if fields, err := c.Fields(ctx); err != nil || len(fields) != 1 {
 		t.Fatalf("Fields() = %v, %v", fields, err)
 	}
@@ -97,7 +97,7 @@ func TestProxyErrorMessage(t *testing.T) {
 		if err != nil {
 			return
 		}
-		defer ws.CloseNow()
+		defer func() { _ = ws.CloseNow() }()
 		var req map[string]any
 		_ = wsjson.Read(r.Context(), ws, &req)
 		_ = wsjson.Write(r.Context(), ws, map[string]any{
@@ -112,7 +112,7 @@ func TestProxyErrorMessage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Close()
+	defer func() { _ = c.Close() }()
 	_, err = c.Fields(ctx)
 	if err == nil || !strings.Contains(err.Error(), "CachedDataServer unavailable") {
 		t.Fatalf("expected the proxy's message, got %v", err)

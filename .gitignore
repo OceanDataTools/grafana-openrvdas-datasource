@@ -49,3 +49,6 @@ ci/
 
 # Local docker compose settings (CDS_URL)
 .env
+
+# macOS
+.DS_Store
