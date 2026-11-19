@@ -1,0 +1,205 @@
+{
+  "uid": "openrvdas-winch-demo",
+  "title": "OpenRVDAS winch (10 Hz demo)",
+  "description": "Synthetic CTD cast streamed at 10 Hz through OpenRVDAS. See demo/winch/README.md.",
+  "tags": ["openrvdas", "demo"],
+  "timezone": "utc",
+  "refresh": "",
+  "time": { "from": "now-59s", "to": "now" },
+  "schemaVersion": 41,
+  "editable": true,
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Wire out",
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 7 },
+      "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+          "fields": ["CTDWinchPayout"]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "lengthm",
+          "decimals": 1,
+          "displayName": "Wire out",
+          "color": { "mode": "fixed", "fixedColor": "blue" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Wire speed (+ out, − in)",
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 7 },
+      "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+          "fields": ["CTDWinchSpeed"]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "suffix: m/min",
+          "decimals": 1,
+          "displayName": "Wire speed",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "orange", "value": null },
+              { "color": "text", "value": -0.05 },
+              { "color": "green", "value": 0.05 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 3,
+      "type": "gauge",
+      "title": "Tension",
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 7 },
+      "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+          "fields": ["CTDWinchTension"]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "masslb",
+          "decimals": 0,
+          "min": 0,
+          "max": 3000,
+          "displayName": "Tension",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2200 },
+              { "color": "red", "value": 2600 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdMarkers": true,
+        "showThresholdLabels": false
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Wire out and speed",
+      "gridPos": { "x": 0, "y": 7, "w": 12, "h": 10 },
+      "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+          "fields": ["CTDWinchPayout", "CTDWinchSpeed"]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "lineWidth": 2, "fillOpacity": 10, "showPoints": "never", "spanNulls": true }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "CTDWinchPayout" },
+            "properties": [
+              { "id": "displayName", "value": "Wire out" },
+              { "id": "unit", "value": "lengthm" },
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } },
+              { "id": "custom.axisPlacement", "value": "left" }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "CTDWinchSpeed" },
+            "properties": [
+              { "id": "displayName", "value": "Wire speed" },
+              { "id": "unit", "value": "suffix: m/min" },
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "green" } },
+              { "id": "custom.axisPlacement", "value": "right" },
+              { "id": "custom.fillOpacity", "value": 0 }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Tension",
+      "gridPos": { "x": 12, "y": 7, "w": 12, "h": 10 },
+      "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "oceandatatools-openrvdas-datasource", "uid": "openrvdas-winch-demo" },
+          "fields": ["CTDWinchTension"]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "masslb",
+          "decimals": 0,
+          "displayName": "Tension",
+          "color": { "mode": "fixed", "fixedColor": "orange" },
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": true,
+            "thresholdsStyle": { "mode": "dashed" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "transparent", "value": null },
+              { "color": "yellow", "value": 2200 },
+              { "color": "red", "value": 2600 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": false },
+        "tooltip": { "mode": "single", "sort": "none" }
+      }
+    }
+  ]
+}

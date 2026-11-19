@@ -1,0 +1,17 @@
+# OpenRVDAS device definition for the winch demo. The device type, `Winch`
+# (the NBP / LCI-90i winch format), comes with OpenRVDAS in
+# contrib/devices/misc_device_types.yaml; this only names the demo's device
+# and its fields. Records tagged `ctdw` are parsed into these field names.
+devices:
+  ctdw:
+    category: "device"
+    device_type: "Winch"
+    serial_number: "demo"
+    description: "CTD winch (synthetic demo cast)"
+    fields:
+      LANID: "CTDWinchLANID"
+      WinchTime: "CTDWinchTime"
+      Name: "CTDWinchName"
+      Tension: "CTDWinchTension"
+      Speed: "CTDWinchSpeed"
+      Payout: "CTDWinchPayout"

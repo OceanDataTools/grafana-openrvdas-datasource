@@ -1,0 +1,41 @@
+# OpenRVDAS logger for the winch demo (logger/listener/listen.py --config_file).
+# start.sh fills in the __PLACEHOLDERS__ and runs it from the OpenRVDAS
+# checkout. It replays the synthetic cast as a serial winch logger would see
+# it, live:
+#
+#   cast log, paced by its own timestamps (10 Hz)
+#     -> drop the log's timestamp, stamp with the current time, tag `ctdw`
+#     -> parse with OpenRVDAS's Winch device type (+ winch_devices.yaml)
+#     -> JSON over UDP to the CachedDataServer on this machine
+#
+# UDP rather than CachedDataWriter: CachedDataWriter sleeps 200 ms whenever
+# its queue is empty, so it delivers 10 Hz data in pairs, 5 times a second.
+# The CDS's UDP input caches each record as it arrives.
+
+readers:
+  class: LogfileReader
+  kwargs:
+    filebase: __LOG_BASE__
+    use_timestamps: true
+    # Records are paced relative to the previous one, so per-record overhead
+    # (~8 ms here) accumulates; speed up slightly to stay at 10 Hz.
+    time_acceleration_factor: __ACCEL__
+
+transforms:
+  - class: SliceTransform       # drop the log's own timestamp
+    kwargs:
+      fields: '1:'
+  - class: TimestampTransform   # stamp with the current time
+  - class: PrefixTransform      # tag with the device's data_id
+    kwargs:
+      prefix: ctdw
+  - class: ParseTransform
+    kwargs:
+      definition_path: logger/devices/*.yaml,contrib/devices/*.yaml,__DEVICES__
+      return_json: true
+
+writers:
+  class: UDPWriter
+  kwargs:
+    destination: 127.0.0.1
+    port: __UDP_PORT__

@@ -37,6 +37,7 @@ Frontend (`src/`) is thin: `DataSourceWithBackend` auto-subscribes to `meta.chan
 ## Docs
 
 - `docs/DESIGN.md`: architecture and the reasons behind it. Keep it current.
+- `demo/winch/`: a 10 Hz winch demo through stock OpenRVDAS (logger + CachedDataServer from a local checkout), with its own Grafana data source and dashboard created by `start.sh`. Not part of `provisioning/`.
 - `docs/INSTALL-DEV.md`: installing an unsigned development build into an existing Grafana. Temporary: delete it, and its link in `CONTRIBUTING.md`, once the plugin is in the Grafana catalog.
 - `src/README.md` is the catalog page and ships in `dist/`. The root `README.md` is an identical copy. Use only absolute links, and keep installation, build and development instructions out of both: Grafana's review rejects READMEs that contain them. Those go in `CONTRIBUTING.md`.
 - `CHANGELOG.md`: user-facing changes only, in the sibling panels' format (`## X.Y.Z - YYYY-MM-DD`, Added/Fixed/Changed/Breaking, PR links).
