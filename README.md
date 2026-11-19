@@ -53,6 +53,12 @@ If a field's latest value is older than the start of the panel's time range, the
 - For panels that animate (compass, attitude, …), set the animation duration to the update interval or less (e.g. 100 ms or 0). Otherwise the needle lags behind the data.
 - To combine fast data (attitude at 10 Hz) with slow data (weather at 1 Hz) efficiently, use **Min interval** on the slow queries, or configure a second data source with a longer update interval.
 
+## License
+
+The plugin is licensed under the [MIT License](LICENSE).
+
+The plugin logo ([`src/img/logo.svg`](src/img/logo.svg)) is the exception. Its nautilus is "Nautilus" by Ulisse Perusin, the GNOME Nautilus icon used in the OpenRVDAS web frontend, which is licensed under the GNU General Public License version 2. The logo is a derivative of that icon, so it is also licensed under GPL-2.0; the full text is in [`src/img/GPL-2.0.txt`](src/img/GPL-2.0.txt).
+
 ## Development
 
 See [docs/DESIGN.md](docs/DESIGN.md) for the architecture.

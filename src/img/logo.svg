@@ -1,1 +1,195 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 81.9 71.52"><defs><style>.cls-1{fill:#84aff1;}.cls-2{fill:#3865ab;}.cls-3{fill:url(#linear-gradient);}</style><linearGradient id="linear-gradient" x1="42.95" y1="16.88" x2="81.9" y2="16.88" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f2cc0c"/><stop offset="1" stop-color="#ff9830"/></linearGradient></defs><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path class="cls-1" d="M55.46,62.43A2,2,0,0,1,54.07,59l4.72-4.54a2,2,0,0,1,2.2-.39l3.65,1.63,3.68-3.64a2,2,0,1,1,2.81,2.84l-4.64,4.6a2,2,0,0,1-2.22.41L60.6,58.26l-3.76,3.61A2,2,0,0,1,55.46,62.43Z"/><path class="cls-2" d="M37,0H2A2,2,0,0,0,0,2V31.76a2,2,0,0,0,2,2H37a2,2,0,0,0,2-2V2A2,2,0,0,0,37,0ZM4,29.76V8.84H35V29.76Z"/><path class="cls-3" d="M79.9,0H45a2,2,0,0,0-2,2V31.76a2,2,0,0,0,2,2h35a2,2,0,0,0,2-2V2A2,2,0,0,0,79.9,0ZM47,29.76V8.84h31V29.76Z"/><path class="cls-2" d="M37,37.76H2a2,2,0,0,0-2,2V69.52a2,2,0,0,0,2,2H37a2,2,0,0,0,2-2V39.76A2,2,0,0,0,37,37.76ZM4,67.52V46.6H35V67.52Z"/><path class="cls-2" d="M79.9,37.76H45a2,2,0,0,0-2,2V69.52a2,2,0,0,0,2,2h35a2,2,0,0,0,2-2V39.76A2,2,0,0,0,79.9,37.76ZM47,67.52V46.6h31V67.52Z"/><rect class="cls-1" x="10.48" y="56.95" width="4" height="5.79"/><rect class="cls-1" x="17.43" y="53.95" width="4" height="8.79"/><rect class="cls-1" x="24.47" y="50.95" width="4" height="11.79"/><path class="cls-1" d="M19.47,25.8a6.93,6.93,0,1,1,6.93-6.92A6.93,6.93,0,0,1,19.47,25.8Zm0-9.85a2.93,2.93,0,1,0,2.93,2.93A2.93,2.93,0,0,0,19.47,16Z"/></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:cc="http://creativecommons.org/ns#" width="246" height="246" viewBox="0 0 246 246">
+<!--
+  OpenRVDAS data source logo.
+
+  The nautilus is "Nautilus" by Ulisse Perusin (the GNOME Nautilus icon), as
+  used in the OpenRVDAS web frontend, licensed under the GNU General Public
+  License version 2 (GPL-2.0). This logo adds a live time-series plot and is
+  a derivative of that icon, so this file is also licensed under GPL-2.0:
+  https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+  The full license text is in src/img/GPL-2.0.txt in the source repository:
+  https://github.com/OceanDataTools/grafana-openrvdas-datasource
+
+  This file is the preferred form for modification (its own source). The rest
+  of the plugin is MIT licensed; see LICENSE.
+-->
+<title>OpenRVDAS data source</title>
+<metadata>
+  <rdf:RDF>
+    <cc:Work rdf:about="">
+      <dc:title>OpenRVDAS data source logo</dc:title>
+      <dc:creator><cc:Agent><dc:title>Ulisse Perusin (nautilus); OceanDataTools (plot, composition)</dc:title></cc:Agent></dc:creator>
+      <dc:source>OpenRVDAS web_frontend/src/assets/nautilus.svg</dc:source>
+      <cc:license rdf:resource="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"/>
+    </cc:Work>
+  </rdf:RDF>
+</metadata><defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient2800">
+      <stop
+         style="stop-color:#7f3104;stop-opacity:0"
+         offset="0"
+         id="stop2802" />
+      <stop
+         style="stop-color:#7f3104;stop-opacity:1"
+         offset="1"
+         id="stop2804" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2254">
+      <stop
+         style="stop-color:#8c4104;stop-opacity:1"
+         offset="0"
+         id="stop2256" />
+      <stop
+         style="stop-color:#a04e0b;stop-opacity:0;"
+         offset="1"
+         id="stop2258" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2246">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop2248" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop2250" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2207">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop2209" />
+      <stop
+         style="stop-color:white;stop-opacity:0.37642586"
+         offset="1"
+         id="stop2211" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2193">
+      <stop
+         style="stop-color:#7c2f03;stop-opacity:1"
+         offset="0"
+         id="stop2195" />
+      <stop
+         style="stop-color:#ff9730;stop-opacity:1"
+         offset="1"
+         id="stop2197" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3256"
+      >
+      <stop
+         id="stop3258"
+         offset="0"
+         style="stop-color:#000000;stop-opacity:1;" />
+      <stop
+         id="stop3260"
+         offset="1"
+         style="stop-color:#000000;stop-opacity:0;" />
+    </linearGradient>
+    <radialGradient
+       xlink:href="#linearGradient3256"
+       id="radialGradient2315"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.315315,0,26.81305)"
+       cx="25.455845"
+       cy="39.161163"
+       fx="25.455845"
+       fy="39.161163"
+       r="19.622213" />
+    <radialGradient
+       xlink:href="#linearGradient2193"
+       id="radialGradient2381"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-1.406852,-2.719337e-2,-2.615301e-2,1.353029,28.40827,13.10321)"
+       cx="2.2106946"
+       cy="9.6087761"
+       fx="1.6693171"
+       fy="8.8713007"
+       r="12.332547" />
+    <linearGradient
+       xlink:href="#linearGradient2207"
+       id="linearGradient2383"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.941299,0,0,0.95119,1.512638,1.012529)"
+       x1="9.8042097"
+       y1="-2.4229071"
+       x2="35.825676"
+       y2="37.941383" />
+    <linearGradient
+       xlink:href="#linearGradient2246"
+       id="linearGradient2387"
+       gradientUnits="userSpaceOnUse"
+       x1="26.59787"
+       y1="16.85297"
+       x2="21.066965"
+       y2="-3.1949208" />
+    <linearGradient
+       xlink:href="#linearGradient2254"
+       id="linearGradient2234"
+       gradientUnits="userSpaceOnUse"
+       x1="36.589283"
+       y1="10.541481"
+       x2="25.339285"
+       y2="25.987909" />
+    <radialGradient
+       xlink:href="#linearGradient2800"
+       id="radialGradient2810"
+       cx="25.501734"
+       cy="30.812386"
+       fx="27.73266"
+       fy="26.358294"
+       r="11.68304"
+       gradientTransform="matrix(-0.974603,0.79438,-0.474803,-0.582523,74.64944,26.0085)"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+<g transform="translate(-6,0) scale(5.2)">  <g
+     id="layer1"
+     style="display:inline">
+    <path
+       style="opacity:0.22352941;color:black;fill:url(#radialGradient2315);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible"
+       id="path3254"
+       d="M 45.078058 39.161163 A 19.622213 6.1871843 0 1 1  5.8336315,39.161163 A 19.622213 6.1871843 0 1 1  45.078058 39.161163 z"
+       transform="matrix(1.044734,0,0,0.727309,-9.459801e-2,13.01773)" />
+    <g
+       id="g2375"
+       transform="matrix(0.90733,0,0,0.926893,3.148753,4.02494)">
+      <path
+         id="path1314"
+         d="M 24.634088,27.484359 C 24.396143,28.160024 24.816573,28.732977 25.498278,29.102669 C 26.902405,29.864133 28.424417,28.934712 28.86867,27.450302 C 29.660781,24.803578 28.630725,22.731601 26.426456,21.652728 C 22.215204,19.591543 17.966698,23.118298 16.507242,27.047094 C 14.302973,32.980896 18.723816,39.516516 24.871774,41.058894 C 34.085631,43.370436 42.984944,36.493467 45.023581,27.860767 C 47.953982,15.451859 38.466478,3.253309 26.28729,1.017909 C 17.470211,-0.60040077 7.180622,2.1474467 0.38712155,8.0646418 C 1.387121,18.064642 8.1391657,23.5 15.639166,27.5"
+         style="fill:url(#radialGradient2381);fill-opacity:1;fill-rule:nonzero;stroke:#582a02;stroke-width:1.09044194;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path2215"
+         d="M 25.736223,28.023796 C 26.236223,28.523796 27.248597,28.397816 27.721669,27.306514 C 28.213229,26.172563 28.213229,23.878588 26.104374,22.7384 C 22.707412,20.901773 18.357211,23.783586 17.197475,28.364367 C 15.975321,33.191688 20.190499,38.955376 25.150364,40.033105 C 33.879487,41.929856 41.887182,35.907276 43.928086,27.55413 C 46.676145,16.306695 38.470015,4.8174055 26.28729,2.1308393 C 19.114881,0.54916101 8.1020654,2.6702759 1.4892564,8.6040784 C 2.6261826,17.473464 9.1110152,22.771135 15.758616,26.410962"
+         style="opacity:0.49019608;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:url(#linearGradient2383);stroke-width:1.09044194;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         style="fill:url(#linearGradient2234);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.25pt;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 21.9375,4.8125 C 23.75216,9.4469652 24.65841,15.001142 22.84375,20.5625 C 24.009085,21.170774 25.573272,21.766726 26,22.375 C 28.258231,14.049247 27.3751,8.5157272 21.9375,4.8125 z M 11.999998,5.5000005 C 14.999998,9.0000011 19.107723,15.222706 19,21 C 20.381579,20.662281 21.236609,20.010388 22.499997,20.500003 C 21.999997,13.500003 18.499997,6.5000007 11.999998,5.5000005 z M 30.09375,7.59375 C 29.738138,13.779268 28.737075,18.240535 26.46875,22.875 C 26.998056,23.792805 27.781071,24.691802 27.5625,25.71875 C 27.522524,25.891976 27.447889,26.098661 27.34375,26.28125 C 27.337747,26.291426 27.318723,26.302292 27.3125,26.3125 L 26.625,28.34375 C 26.595284,28.355173 26.55892,28.390215 26.53125,28.40625 C 26.51735,28.414116 26.483164,28.430809 26.46875,28.4375 L 24.65625,29.84375 C 28.285569,30.307197 37.34159,27.061358 39.15625,21.5 C 35.477574,24.35274 32.576893,25.493118 28.71875,27.0625 C 31.440739,25.295611 37.359915,20.550751 36.90625,14.0625 C 34.406696,18.747636 31.166075,22.213825 28.21875,25.21875 C 30.543783,21.482212 34.6304,15.008894 30.09375,7.59375 z "
+         transform="matrix(1.102135,0,0,1.078873,-0.163946,-2.184653)"
+         id="path2225"
+         />
+      <path
+         id="path2234"
+         d="M 19.626245,1.2043425 C 12.732887,1.4704151 6.0951254,3.8237042 1,8.2616005 C 1.1919415,10.181016 4.4488631,17.670647 6.4488631,20.170647 C 17.948863,23.170647 19.639166,-1.5340571 43.139166,14.965943 C 39.639166,8.4659429 35.404576,4.0681142 27.904576,2.0681142 C 25.694597,1.4787865 21.924031,1.1156516 19.626245,1.2043425 z "
+         style="opacity:0.57254902;fill:url(#linearGradient2387);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.99999962pt;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="opacity:0.5;fill:url(#radialGradient2810);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 19.568211,34.473509 C 25.285877,42.54425 43.816283,34.910365 42.378807,20.968433 C 44.302458,28.747032 41.022918,35.697299 35.731173,38.952137 C 30.170078,42.372646 22.676912,41.922534 19.568211,34.473509 z "
+       id="path1911"
+       />
+  </g></g>
+<g>
+  <rect x="106" y="140" width="132" height="92" rx="10" fill="#ffffff" stroke="#111827" stroke-width="3"/>
+  <g stroke="#111827" stroke-opacity="0.18" stroke-width="1.5"><line x1="116" y1="172.2" x2="228" y2="172.2"/><line x1="116" y1="199.8" x2="228" y2="199.8"/></g>
+  <polyline points="116.0,180.0 120.8,171.6 125.6,173.0 130.5,177.7 135.3,177.7 140.1,172.7 144.9,170.1 149.7,177.2 154.5,193.3 159.4,208.8 164.2,214.1 169.0,207.7 173.8,197.1 178.6,191.3 183.5,191.8 188.3,192.2 193.1,185.4 197.9,172.1 202.7,161.2 207.5,161.5 212.4,173.7 217.2,189.2 222.0,198.1" fill="none" stroke="#5794F2" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="222.0" cy="198.1" r="7" fill="#F2495C" stroke="#111827" stroke-width="1.5"/>
+</g>
+</svg>
