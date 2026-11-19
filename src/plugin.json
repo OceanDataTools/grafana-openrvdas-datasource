@@ -31,7 +31,20 @@
         "url": "https://raw.githubusercontent.com/OceanDataTools/grafana-openrvdas-datasource/refs/heads/main/LICENSE"
       }
     ],
-    "screenshots": [],
+    "screenshots": [
+      {
+        "name": "Live dashboard streaming from OpenRVDAS",
+        "path": "screenshots/live-dashboard.png"
+      },
+      {
+        "name": "Query editor with roll and pitch streaming",
+        "path": "screenshots/panel-editor.png"
+      },
+      {
+        "name": "Configuration with the OpenRVDAS API",
+        "path": "screenshots/config-editor.png"
+      }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },

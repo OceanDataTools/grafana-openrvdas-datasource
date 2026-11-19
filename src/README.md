@@ -4,6 +4,8 @@ Real-time streaming of [OpenRVDAS](https://github.com/OceanDataTools/openrvdas) 
 
 The data source connects to an OpenRVDAS **CachedDataServer**, through the OpenRVDAS API with an API key or directly, and streams the fields you choose through Grafana Live at up to 10 Hz. Panels show the current value as soon as they load and then update continuously. It pairs well with the OceanDataTools compass, attitude and windrose panels.
 
+![Live dashboard streaming from OpenRVDAS](https://raw.githubusercontent.com/OceanDataTools/grafana-openrvdas-datasource/main/src/screenshots/live-dashboard.png)
+
 This data source is for **live** data only. For historical data, use the database OpenRVDAS writes to (e.g. InfluxDB) with its own Grafana data source.
 
 ## Requirements
@@ -23,6 +25,8 @@ This data source is for **live** data only. For historical data, use the databas
 | **Update interval (ms)** | How often the CachedDataServer sends new data. Default 100 ms (10 Hz).                                                                                                         |
 | **Skip TLS verify**      | Accept self-signed certificates for `wss://` URLs.                                                                                                                             |
 
+![Configuration with the OpenRVDAS API](https://raw.githubusercontent.com/OceanDataTools/grafana-openrvdas-datasource/main/src/screenshots/config-editor.png)
+
 **Save & test** connects to the server and reports how many fields are available. With the OpenRVDAS API, it tells you if the API key was rejected.
 
 ### Creating an API key
@@ -36,6 +40,8 @@ Grafana stores the key encrypted. Only the Grafana server uses it, sending it in
 - **Fields**: pick one or more fields, or type a pattern with `*` (e.g. `S330*`, `Mwx*Wind*`). Dashboard variables can be used.
 - **Min interval (ms)**: optionally slow a query down to one value (the most recent) per interval.
 - **Stream**: on by default. Turn it off to return only the latest values.
+
+![Query editor with roll and pitch streaming](https://raw.githubusercontent.com/OceanDataTools/grafana-openrvdas-datasource/main/src/screenshots/panel-editor.png)
 
 Each field becomes its own series, named after the field, with units and descriptions taken from OpenRVDAS metadata when available.
 
