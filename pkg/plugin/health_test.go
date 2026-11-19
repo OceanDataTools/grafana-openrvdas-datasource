@@ -25,7 +25,7 @@ func fakeServer(t *testing.T, key string) *httptest.Server {
 		if err != nil {
 			return
 		}
-		defer ws.CloseNow()
+		defer func() { _ = ws.CloseNow() }()
 		for {
 			var req map[string]any
 			if err := wsjson.Read(r.Context(), ws, &req); err != nil {

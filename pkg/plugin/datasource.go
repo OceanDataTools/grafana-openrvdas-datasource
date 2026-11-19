@@ -475,7 +475,7 @@ func (d *Datasource) CheckHealth(ctx context.Context, _ *backend.CheckHealthRequ
 	if err != nil {
 		return fail(connectErrorMessage(err, d.settings))
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 	fields, err := conn.Fields(ctx)
 	if err != nil {
 		return fail(fmt.Sprintf("Connected to the %s at %s, but the fields request failed: %v",
