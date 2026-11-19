@@ -5,7 +5,7 @@
   "tags": ["openrvdas", "demo"],
   "timezone": "utc",
   "refresh": "",
-  "time": { "from": "now-5m", "to": "now" },
+  "time": { "from": "now-70s", "to": "now" },
   "schemaVersion": 41,
   "editable": true,
   "panels": [
