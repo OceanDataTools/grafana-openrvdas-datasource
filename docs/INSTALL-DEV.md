@@ -13,6 +13,36 @@ must match the Grafana server's OS and CPU and must be executable.
 13.x), and access to an OpenRVDAS server from the Grafana host. See the
 [README](../README.md#configuration) for the connection options.
 
+## Install from a release (no build needed)
+
+Each [GitHub release](https://github.com/OceanDataTools/grafana-openrvdas-datasource/releases)
+has a ready-made zip with backends for every supported platform, e.g.
+`oceandatatools-openrvdas-datasource-1.0.0.zip`, and its `.sha1` checksum.
+Releases are unsigned until the plugin is accepted into the catalog, so you
+still have to allow the unsigned plugin.
+
+**Linux package, Homebrew or Windows:** install with the Grafana CLI, then
+allow the plugin and restart Grafana as described in
+[Linux package](#linux-package) or [Homebrew and Windows](#homebrew-and-windows):
+
+```bash
+sudo grafana cli \
+  --pluginUrl https://github.com/OceanDataTools/grafana-openrvdas-datasource/releases/download/v1.0.0/oceandatatools-openrvdas-datasource-1.0.0.zip \
+  plugins install oceandatatools-openrvdas-datasource
+```
+
+**Docker:** let Grafana install it at startup:
+
+```bash
+docker run -d --name grafana -p 3000:3000 \
+  -e GF_PLUGINS_PREINSTALL=oceandatatools-openrvdas-datasource@1.0.0@https://github.com/OceanDataTools/grafana-openrvdas-datasource/releases/download/v1.0.0/oceandatatools-openrvdas-datasource-1.0.0.zip \
+  -e GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=oceandatatools-openrvdas-datasource \
+  grafana/grafana:13.2.4
+```
+
+For a newer release, change the version in the URL. Then continue with
+[3. Verify](#3-verify). To build from source instead, follow the steps below.
+
 ## 1. Build the plugin
 
 You can build on any machine. A full build contains backends for every
