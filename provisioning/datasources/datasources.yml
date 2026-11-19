@@ -1,15 +1,18 @@
 apiVersion: 1
 
-# Values come from the environment (see docker-compose.yaml); put them in a
+# Values come from the environment (see docker-compose.yaml). By default this
+# points at the bundled CDS simulator (cmd/cds-sim), so `docker compose up`
+# works from a fresh checkout. To use a real OpenRVDAS, put these in a
 # git-ignored .env file:
-#
-#   Direct (legacy, unauthenticated):
-#     CDS_URL=ws://<host>:8766
 #
 #   OpenRVDAS API (authenticated):
 #     CDS_CONNECTION_MODE=proxy
 #     CDS_URL=wss://<host>/api/v1/ws/data-server
 #     OPENRVDAS_API_KEY=<key with the WEBSOCKET permission>
+#
+#   Direct (legacy, unauthenticated):
+#     CDS_CONNECTION_MODE=direct
+#     CDS_URL=ws://<host>:8766
 
 datasources:
   - name: 'OpenRVDAS'
