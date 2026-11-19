@@ -276,7 +276,41 @@ Query model:
 | Go protocol | `pkg/cds/manager_test.go` | In-process fake CDS: subscribe, de-dup across re-subscribe, unsubscribe/close, reconnect |
 | Go protocol (proxy) | `pkg/cds/proxy_test.go`, `pkg/plugin/health_test.go` | API key header, 403/404 handshake errors, proxy `error` messages, health-check messages per mode |
 | Go integration | `pkg/cds/integration_test.go` | `CDS_URL=… [OPENRVDAS_API_KEY=…] go test -tags integration ./pkg/cds/`; `OPENRVDAS_PROXY_URL=…` checks that bad keys are rejected |
+| Simulator | `pkg/cdssim/sim_test.go` | The simulator driven by the plugin's own client and `Manager`: fields, describe, latest, API-key handshake, 10 Hz streaming |
 | E2E | `tests/*.spec.ts` | Config editor, query editor, and live messages reaching the browser on the provisioned dashboard |
+
+### Test environment: the CDS simulator
+
+Grafana's plugin reviewers expect `docker compose up` on a fresh checkout to
+make the provisioned dashboard work, and CI's e2e job has no OpenRVDAS to
+talk to. So `docker-compose.yaml` runs `cds-sim` (`cmd/cds-sim`,
+`pkg/cdssim`), a small Go stand-in for the CDS with smooth, deterministic
+ship data named after the OpenRVDAS NBP sample: 10 Hz `S330` attitude,
+1 Hz navigation and met, and a 10 s average. The provisioned data source
+points at it in proxy mode with a published dummy key (`cds-sim-demo-key`),
+so the recommended connection path, including the `X-API-Key` handshake, is
+what reviewers and CI exercise. A git-ignored `.env` overrides the
+connection to use a real OpenRVDAS.
+
+The simulator implements only the protocol subset the plugin uses, with
+exact field names (no CDS regex matching). It is not a substitute for
+testing against stock OpenRVDAS: the integration tests and a real CDS
+remain the check on protocol fidelity. The e2e tests and the provisioned
+dashboard depend on its field names and units.
+
+### CI and releases
+
+- `ci.yml` runs on pushes and PRs to `dev` and `main`: frontend typecheck,
+  lint, Jest and build; golangci-lint, mage build and Go tests; the
+  plugin-validator metadata check; then Playwright e2e against the
+  simulator on a matrix of Grafana versions from `grafanaDependency`.
+- `is-compatible.yml` checks every PR against the latest Grafana frontend
+  APIs.
+- `release.yml` runs on a `vX.Y.Z` tag (on `main`), builds all platforms,
+  attests build provenance, and creates a draft GitHub release with the
+  zip and sha1 used in the catalog submission form. It signs only when the
+  `GRAFANA_ACCESS_POLICY_TOKEN` secret is set, which is useful only after
+  Grafana approves the plugin and grants a signature level.
 
 ## Known limitations and future work
 

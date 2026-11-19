@@ -57,28 +57,34 @@ If a field's latest value is older than the start of the panel's time range, the
 
 See [docs/DESIGN.md](docs/DESIGN.md) for the architecture.
 
-Prerequisites: Node 22 (`.nvmrc`), Go (see `go.mod`), [mage](https://magefile.org), Docker.
+Prerequisites: Node 24.5+ (`.nvmrc`), Go (see `go.mod`), [mage](https://magefile.org), Docker.
 
 ```bash
 npm install
 npm run dev                      # frontend, watch mode
 mage -v build:linuxARM64         # backend for the dev container (build:linux on x86_64); rerun after Go changes
-# Connection for the provisioned data source, in a git-ignored .env:
-#   CDS_URL=ws://<host>:8766                                   (direct)
-# or
-#   CDS_CONNECTION_MODE=proxy
-#   CDS_URL=wss://<host>/api/v1/ws/data-server
-#   OPENRVDAS_API_KEY=<key>
 npm run server                   # Grafana at http://localhost:3000 with the "OpenRVDAS live" dashboard
+```
+
+`npm run server` also starts `cds-sim`, a simulated CachedDataServer (`cmd/cds-sim`) with 10 Hz attitude and 1 Hz navigation and met fields. The provisioned data source uses it by default, through the OpenRVDAS API path with a dummy key, so a fresh checkout works with no OpenRVDAS install. To use a real OpenRVDAS instead, put the connection in a git-ignored `.env`:
+
+```bash
+# OpenRVDAS API (authenticated)
+CDS_CONNECTION_MODE=proxy
+CDS_URL=wss://<host>/api/v1/ws/data-server
+OPENRVDAS_API_KEY=<key>
+# or direct (legacy, unauthenticated)
+CDS_CONNECTION_MODE=direct
+CDS_URL=ws://<host>:8766
 ```
 
 Tests:
 
 ```bash
-go test -race ./pkg/...                                            # Go unit + fake-CDS protocol tests
+go test -race ./pkg/...                                            # Go unit, fake-CDS protocol and simulator tests
 CDS_URL=ws://<cds-host>:8766 go test -tags integration -v ./pkg/cds/   # against a real CDS (add OPENRVDAS_API_KEY for the proxy)
 npm run test:ci                                                    # Jest
-npm run e2e                                                        # Playwright; needs the server running
+npm run e2e                                                        # Playwright; needs the server running (simulator or a live CDS)
 GRAFANA_VERSION=12.0.10 npm run server                             # test the oldest supported Grafana
 ```
 

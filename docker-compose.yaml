@@ -3,10 +3,24 @@ services:
     extends:
       file: .config/docker-compose-base.yaml
       service: grafana
+    depends_on:
+      - cds-sim
     environment:
       # Connection used by the provisioned data source; see
-      # provisioning/datasources/datasources.yml. Set these in a git-ignored
-      # .env file or the environment.
-      CDS_URL: ${CDS_URL:-ws://host.docker.internal:8766}
-      CDS_CONNECTION_MODE: ${CDS_CONNECTION_MODE:-direct}
-      OPENRVDAS_API_KEY: ${OPENRVDAS_API_KEY:-}
+      # provisioning/datasources/datasources.yml. By default it is the
+      # bundled CDS simulator below, through the OpenRVDAS API path with its
+      # dummy key. To use a real OpenRVDAS, set these in a git-ignored .env
+      # file or the environment.
+      CDS_URL: ${CDS_URL:-ws://cds-sim:8766/api/v1/ws/data-server}
+      CDS_CONNECTION_MODE: ${CDS_CONNECTION_MODE:-proxy}
+      OPENRVDAS_API_KEY: ${OPENRVDAS_API_KEY:-cds-sim-demo-key}
+
+  # Simulated OpenRVDAS CachedDataServer (cmd/cds-sim): 10 Hz attitude plus
+  # 1 Hz navigation and met fields, for reviewers, CI and local development.
+  # A test tool only; the key below is not a secret.
+  cds-sim:
+    build:
+      context: .
+      dockerfile: cmd/cds-sim/Dockerfile
+    environment:
+      CDS_SIM_API_KEY: cds-sim-demo-key
