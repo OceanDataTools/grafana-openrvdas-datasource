@@ -31,6 +31,10 @@ CDS_CONNECTION_MODE=direct
 CDS_URL=ws://<host>:8766
 ```
 
+### Winch demo with OpenRVDAS
+
+To see the plugin against stock OpenRVDAS at 10 Hz, rather than the simulator, run [demo/winch/start.sh](demo/winch/README.md). It streams a synthetic CTD cast through a local OpenRVDAS logger and CachedDataServer, and sets up a winch dashboard in the dev Grafana.
+
 ## Tests
 
 ```bash

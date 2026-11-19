@@ -52,3 +52,6 @@ ci/
 
 # macOS
 .DS_Store
+
+# Winch demo: generated cast log
+demo/winch/data/

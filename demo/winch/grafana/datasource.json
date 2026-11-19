@@ -1,0 +1,12 @@
+{
+  "name": "OpenRVDAS winch demo",
+  "uid": "openrvdas-winch-demo",
+  "type": "oceandatatools-openrvdas-datasource",
+  "access": "proxy",
+  "isDefault": false,
+  "jsonData": {
+    "connectionMode": "direct",
+    "url": "__CDS_URL__",
+    "pollIntervalMs": 100
+  }
+}
