@@ -54,7 +54,7 @@ func (f *fakeCDS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	defer ws.CloseNow()
+	defer func() { _ = ws.CloseNow() }()
 	f.mu.Lock()
 	f.connects++
 	f.open++
@@ -283,7 +283,7 @@ func TestClientOneShots(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Close()
+	defer func() { _ = c.Close() }()
 	fields, err := c.Fields(ctx)
 	if err != nil || len(fields) != 2 {
 		t.Fatalf("Fields() = %v, %v", fields, err)
